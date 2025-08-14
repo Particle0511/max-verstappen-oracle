@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+venv
+
+# Terraform
+.terraform
+*.tfstate
+*.tfstate.*
+
+# Docs
+/docs
+
+# IDE / Editor specific
+.idea/
+.vscode/

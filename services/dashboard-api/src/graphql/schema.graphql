@@ -1,0 +1,23 @@
+type Query {
+  pitStopPrediction: PitStopPrediction
+  overtakePrediction: OvertakePrediction
+  leaderboard: [LeaderboardEntry]
+}
+
+type PitStopPrediction {
+  predicted_lap: Int
+  confidence: Float
+  strategy_name: String
+}
+
+type OvertakePrediction {
+  probability: Float
+  target_driver: String
+  on_lap: Int
+}
+
+type LeaderboardEntry {
+  userId: Int
+  name: String
+  points: Int
+}

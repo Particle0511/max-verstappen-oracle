@@ -1,0 +1,67 @@
+services:
+  telemetry-ingestor:
+    build:
+      context: ./services/telemetry-ingestor
+      dockerfile: Dockerfile
+    container_name: telemetry-ingestor
+    ports:
+      - "8765:8765"
+    networks:
+      - oracle_network
+
+  data-processor:
+    build:
+      context: ./services/data-processor
+      dockerfile: Dockerfile
+    container_name: data-processor
+    environment:
+      - INGESTOR_HOST=telemetry-ingestor
+      - INGESTOR_PORT=8765
+    depends_on:
+      - telemetry-ingestor
+    networks:
+      - oracle_network
+
+  oracle-ai-engine:
+    build:
+      context: ./services/oracle-ai-engine
+      dockerfile: Dockerfile
+    container_name: oracle-ai-engine
+    networks:
+      - oracle_network
+
+  user-auth-service:
+    build:
+      context: ./services/user-auth-service
+      dockerfile: Dockerfile
+    container_name: user-auth-service
+    networks:
+      - oracle_network
+
+  gamification-engine:
+    build:
+      context: ./services/gamification-engine
+      dockerfile: Dockerfile
+    container_name: gamification-engine
+    networks:
+      - oracle_network
+
+  dashboard-api:
+    build:
+      context: ./services/dashboard-api
+      dockerfile: Dockerfile
+    container_name: dashboard-api
+    ports:
+      - "8080:80" # Expose GraphQL API on port 8080
+    environment:
+      - AI_ENGINE_URL=http://oracle-ai-engine
+      - GAME_ENGINE_URL=http://gamification-engine
+    depends_on:
+      - oracle-ai-engine
+      - gamification-engine
+    networks:
+      - oracle_network
+
+networks:
+  oracle_network:
+    driver: bridge

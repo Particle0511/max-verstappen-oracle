@@ -1,0 +1,61 @@
+name: Gamification Engine CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/gamification-engine/**'
+  pull_request:
+    paths:
+      - 'services/gamification-engine/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies and build
+        working-directory: ./services/gamification-engine
+        run: |
+          npm install
+          npm run build
+      
+      - name: Log in to the GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/gamification-engine
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/gamification-engine
+          file: ./services/gamification-engine/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy (Placeholder)
+        run: |
+          # This will be configured later to deploy to our server
+          echo "Deploying..."
+          echo "Image: ghcr.io/${{ github.repository }}/gamification-engine:latest"

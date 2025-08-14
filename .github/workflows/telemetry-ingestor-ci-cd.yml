@@ -1,0 +1,67 @@
+name: Telemetry Ingestor CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/telemetry-ingestor/**'
+  pull_request:
+    paths:
+      - 'services/telemetry-ingestor/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        working-directory: ./services/telemetry-ingestor
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run tests (Placeholder)
+        working-directory: ./services/telemetry-ingestor
+        run: |
+          # We will add actual tests here later
+          echo "Running tests..."
+
+      - name: Log in to the GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/telemetry-ingestor
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/telemetry-ingestor
+          file: ./services/telemetry-ingestor/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy (Placeholder)
+        run: |
+          # This will be configured later to deploy to our server
+          echo "Deploying..."
+          echo "Image: ghcr.io/${{ github.repository }}/telemetry-ingestor:latest"

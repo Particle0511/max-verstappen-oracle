@@ -1,0 +1,61 @@
+name: User Auth Service CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/user-auth-service/**'
+  pull_request:
+    paths:
+      - 'services/user-auth-service/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies and build
+        working-directory: ./services/user-auth-service
+        run: |
+          npm install
+          npm run build
+      
+      - name: Log in to the GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/user-auth-service
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/user-auth-service
+          file: ./services/user-auth-service/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy (Placeholder)
+        run: |
+          # This will be configured later to deploy to our server
+          echo "Deploying..."
+          echo "Image: ghcr.io/${{ github.repository }}/user-auth-service:latest"
