@@ -1,6 +1,13 @@
+"""
+Main entry point for the Oracle AI Engine service.
+
+This service provides API endpoints to serve predictions from the ML models.
+"""
+
 import logging
-from fastapi import FastAPI # type: ignore
-from . import models
+from fastapi import FastAPI
+# Corrected import: Changed from relative to absolute
+from app import models
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
