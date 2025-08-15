@@ -25,11 +25,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          
-      - name: Configure Next.js for standalone output
-        working-directory: ./frontend
-        run: |
-          sed -i 's/reactStrictMode: true,/reactStrictMode: true,\\n  output: "standalone",/' next.config.js
 
       - name: Install dependencies and build
         working-directory: ./frontend
