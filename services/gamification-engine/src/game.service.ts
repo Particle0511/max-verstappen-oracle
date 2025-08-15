@@ -1,4 +1,4 @@
-import { Prediction, LeaderboardEntry } from './types';
+import { Prediction, LeaderboardEntry, PredictionInput } from './types';
 
 // In-memory data stores
 const predictions: Prediction[] = [];
@@ -8,7 +8,7 @@ const leaderboard: LeaderboardEntry[] = [
   { userId: 3, name: 'DutchLion', points: 110 },
 ];
 
-export const createPrediction = async (predictionData: Omit<Prediction, 'id'>): Promise<Prediction> => {
+export const createPrediction = async (predictionData: PredictionInput): Promise<Prediction> => {
   const newPrediction: Prediction = {
     id: predictions.length + 1,
     ...predictionData,

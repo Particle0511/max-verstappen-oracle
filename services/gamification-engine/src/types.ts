@@ -11,3 +11,6 @@ export interface LeaderboardEntry {
   name: string;
   points: number;
 }
+
+// New type for the data we expect from the API call
+export type PredictionInput = Omit<Prediction, 'id' | 'timestamp'>;
