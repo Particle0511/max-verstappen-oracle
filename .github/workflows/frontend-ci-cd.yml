@@ -25,6 +25,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          
+      - name: Configure Next.js for standalone output
+        working-directory: ./frontend
+        run: |
+          sed -i 's/reactStrictMode: true,/reactStrictMode: true,\\n  output: "standalone",/' next.config.js
 
       - name: Install dependencies and build
         working-directory: ./frontend
@@ -46,12 +51,15 @@ jobs:
           images: ghcr.io/${{ github.repository }}/frontend
 
       - name: Build and push Docker image
-        # We need a Dockerfile for the frontend first.
-        # This step will be added once the Dockerfile is created.
-        run: echo "Dockerfile for frontend is needed to build the image."
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       - name: Deploy (Placeholder)
         run: |
           # This will be configured later to deploy to our server
           echo "Deploying..."
-
