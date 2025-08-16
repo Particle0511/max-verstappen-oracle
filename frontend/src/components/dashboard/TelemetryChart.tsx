@@ -7,9 +7,8 @@ interface TelemetryChartProps {
 }
 
 const TelemetryChart = ({ data }: TelemetryChartProps) => {
-  // Format the data for the chart
   const chartData = data.map((d, i) => ({
-    time: i, // Use index as a simple time axis
+    time: i,
     speed: d.car_data.speed,
     rpm: d.car_data.rpm,
   }));

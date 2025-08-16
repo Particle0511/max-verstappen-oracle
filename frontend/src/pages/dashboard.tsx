@@ -2,24 +2,26 @@ import Head from 'next/head';
 import { useQuery } from '@apollo/client';
 import { GET_DASHBOARD_DATA } from '@/graphql/queries';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import TrackMap from '@/components/dashboard/TrackMap';
 import TelemetryChart from '@/components/dashboard/TelemetryChart';
 import { useTelemetry } from '@/hooks/useTelemetry';
-import { Wifi, WifiOff } from 'lucide-react';
+import { Wifi, WifiOff, CloudSun } from 'lucide-react';
 import React from 'react';
 
 interface TelemetryWidgetProps {
   title: string;
-  value: string | number;
-  unit: string;
+  value?: string | number;
+  unit?: string;
+  children?: React.ReactNode;
 }
 
-const TelemetryWidget: React.FC<TelemetryWidgetProps> = ({ title, value, unit }) => (
-  <div className="bg-oracle-lightblue p-4 rounded-lg shadow-lg text-center">
+const TelemetryWidget: React.FC<TelemetryWidgetProps> = ({ title, value, unit, children }) => (
+  <div className="bg-oracle-lightblue p-4 rounded-lg shadow-lg text-center flex flex-col justify-center">
     <h3 className="text-lg font-semibold text-oracle-gray">{title}</h3>
-    <p className="text-4xl font-bold text-oracle-lightgray mt-1">
-      {value} <span className="text-lg text-oracle-gray">{unit}</span>
-    </p>
+    {children || (
+      <p className="text-4xl font-bold text-oracle-lightgray mt-1">
+        {value} <span className="text-lg text-oracle-gray">{unit}</span>
+      </p>
+    )}
   </div>
 );
 
@@ -29,6 +31,9 @@ const DashboardPage = () => {
 
   if (loading) return <p className="text-center text-oracle-gray">Loading Dashboard...</p>;
   if (error) return <p className="text-center text-red-500">Error fetching data: {error.message}</p>;
+
+  // A check to ensure data is available before destructuring
+  if (!data) return <p className="text-center text-oracle-gray">Waiting for data...</p>;
 
   const { pitStopPrediction, overtakePrediction, leaderboard } = data;
 
@@ -48,16 +53,14 @@ const DashboardPage = () => {
           </div>
         </div>
         
-        {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <TelemetryWidget title="Speed" value={latestData?.car_data.speed || '---'} unit="km/h" />
-              <TelemetryWidget title="RPM" value={latestData?.car_data.rpm || '---'} unit="" />
-              <TelemetryWidget title="Gear" value={latestData?.car_data.gear || 'N'} unit="" />
-              <TelemetryWidget title="DRS" value={latestData?.car_data.drs_enabled ? 'Active' : 'Inactive'} unit="" />
+              <TelemetryWidget title="RPM" value={latestData?.car_data.rpm || '---'} />
+              <TelemetryWidget title="Gear" value={latestData?.car_data.gear || 'N'} />
+              <TelemetryWidget title="DRS" value={latestData?.car_data.drs_enabled ? 'Active' : 'Inactive'} />
             </div>
             <TelemetryChart data={history} />
             <div className="bg-oracle-lightblue p-6 rounded-lg shadow-lg">
@@ -79,9 +82,18 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Right Column (Sidebar) */}
           <div className="space-y-8">
-            <TrackMap />
+            <div className="grid grid-cols-2 gap-4">
+                <TelemetryWidget title="Current Lap" value={`${latestData?.lap_data.current_lap || '--'}/58`} />
+                <TelemetryWidget title="Tyre" value={latestData?.tyre_data.compound || '---'} />
+                <TelemetryWidget title="Weather">
+                  <div className="flex items-center justify-center mt-2 space-x-2 text-oracle-lightgray">
+                    <CloudSun size={28} />
+                    <span className="text-3xl font-bold">24°C</span>
+                  </div>
+                </TelemetryWidget>
+                <TelemetryWidget title="DRS" value={latestData?.car_data.drs_enabled ? 'Active' : 'Inactive'} />
+            </div>
             <div className="bg-oracle-lightblue p-6 rounded-lg shadow-lg">
               <h2 className="text-xl font-semibold text-oracle-gray">Pit Stop Prediction</h2>
               <p className="text-5xl font-bold text-oracle-red mt-2">

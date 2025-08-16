@@ -4,7 +4,7 @@ import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client'
 import Layout from '@/components/layout/Layout'
 
 const client = new ApolloClient({
-  uri: process.env.NEXT_PUBLIC_DASHBOARD_API_URL || 'http://localhost:8080/graphql',
+  uri: 'http://localhost:8080/graphql', // <-- UPDATED LINE
   cache: new InMemoryCache(),
 });
 

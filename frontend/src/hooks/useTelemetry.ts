@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TelemetryData } from '@/types';
 
-const WEBSOCKET_URL = process.env.NEXT_PUBLIC_TELEMETRY_URL || 'ws://localhost:8765';
+const WEBSOCKET_URL = 'ws://localhost:8080/telemetry';
 
 export const useTelemetry = () => {
   const [latestData, setLatestData] = useState<TelemetryData | null>(null);
@@ -21,7 +21,6 @@ export const useTelemetry = () => {
       setLatestData(data);
       setHistory((prevHistory) => {
         const newHistory = [...prevHistory, data];
-        // Keep only the last 100 data points for performance
         return newHistory.slice(-100);
       });
     };
@@ -36,7 +35,6 @@ export const useTelemetry = () => {
       setIsConnected(false);
     };
 
-    // Clean up the connection when the component unmounts
     return () => {
       ws.close();
     };
