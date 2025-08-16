@@ -2,6 +2,7 @@
 /node_modules
 /frontend/node_modules
 /services/*/node_modules
+/local-server/node_modules
 /frontend/.next
 /services/*/dist
 npm-debug.log*
